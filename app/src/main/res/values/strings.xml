@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Bus Texter</string>
+    <string name="action_settings">Settings</string>
+    <string name="UBC49">UBC49</string>
+    <string name="oak49">oak49</string>
+    <string name="oak41">oak41</string>
+    <string name="hospital">hospital</string>
+
+</resources>
