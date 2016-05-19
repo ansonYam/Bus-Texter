@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,6 +18,13 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.view.GestureDetector;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 /**
@@ -27,6 +35,9 @@ public class TopButton extends Service {
     private ImageView chatHead;
     WindowManager.LayoutParams params;
     private GestureDetector gestureDetector;
+
+    private ArrayList<JSONObject> filedata;
+    String FILENAME = "DATA_STORE";
 
     String textTransLink = "33333";
 
@@ -39,6 +50,13 @@ public class TopButton extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+
+        try {
+            filedata = listofCommands.getJSONarray(FILENAME, getApplicationContext());
+        } catch (IOException|JSONException e) {
+            e.printStackTrace();
+        }
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         gestureDetector = new GestureDetector(this, new SingleTapConfirm());
@@ -57,54 +75,7 @@ public class TopButton extends Service {
         params.x = 0;
         params.y = 0;
 
-        /*
-        chatHead.setOnClickListener(new View.OnClickListener() {
-            @TargetApi(Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onClick(View view) {
-
-                PopupMenu popup = new PopupMenu(getBaseContext(), view,
-                        Gravity.START | Gravity.CENTER_HORIZONTAL);
-
-                popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
-
-
-                popup.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-                                                     //@Override
-                                                     public boolean onMenuItemClick(MenuItem item) {
-                                                         android.telephony.SmsManager smsManager = SmsManager.getDefault();
-
-                                                         switch (item.getItemId()) {
-                                                             case R.id.UBC49:
-                                                                 smsManager.sendTextMessage(textTransLink, null, UBC49, null, null);
-                                                                 return true;
-
-                                                             case R.id.hospital:
-                                                                 smsManager.sendTextMessage(textTransLink, null, hospital, null, null);
-                                                                 return true;
-
-                                                             case R.id.oak41:
-                                                                 smsManager.sendTextMessage(textTransLink, null, oak41, null, null);
-                                                                 return true;
-
-                                                             case R.id.oak49:
-                                                                 smsManager.sendTextMessage(textTransLink, null, oak49, null, null);
-                                                                 return true;
-
-                                                             default:
-                                                                 return true;
-                                                         }
-                                                     }
-                                                 }
-
-                );
-
-                popup.show();
-            }
-        });
-*/
-        chatHead.setOnTouchListener(new View.OnTouchListener() {
+     chatHead.setOnTouchListener(new View.OnTouchListener() {
             private int initialX;
             private int initialY;
             private float initialTouchX;
@@ -117,8 +88,17 @@ public class TopButton extends Service {
                     PopupMenu popup = new PopupMenu(getBaseContext(), v,
                             Gravity.START | Gravity.CENTER_HORIZONTAL);
 
-                    popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
+                    Menu menu = popup.getMenu();
 
+                    for(int i = 0; i < filedata.size(); i++){
+                        try {
+                            menu.add(1, i, i, filedata.get(i).get("label").toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    popup.getMenuInflater().inflate(R.menu.menu_main, menu);
 
                     popup.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
@@ -126,26 +106,17 @@ public class TopButton extends Service {
                                                          public boolean onMenuItemClick(MenuItem item) {
                                                              android.telephony.SmsManager smsManager = SmsManager.getDefault();
 
-                                                             switch (item.getItemId()) {
-                                                                 case R.id.UBC49:
-                                                                     smsManager.sendTextMessage(textTransLink, null, UBC49, null, null);
-                                                                     return true;
+                                                             //Toast.makeText(getApplicationContext(), String.valueOf(item.getItemId()),Toast.LENGTH_LONG).show();
+                                                             JSONObject content = filedata.get(item.getItemId());
 
-                                                                 case R.id.hospital:
-                                                                     smsManager.sendTextMessage(textTransLink, null, hospital, null, null);
-                                                                     return true;
-
-                                                                 case R.id.oak41:
-                                                                     smsManager.sendTextMessage(textTransLink, null, oak41, null, null);
-                                                                     return true;
-
-                                                                 case R.id.oak49:
-                                                                     smsManager.sendTextMessage(textTransLink, null, oak49, null, null);
-                                                                     return true;
-
-                                                                 default:
-                                                                     return true;
+                                                             try {
+                                                                 smsManager.sendTextMessage((String)content.get("number"), null, (String)content.get("message"), null, null);
+                                                             } catch (JSONException e) {
+                                                                 e.printStackTrace();
                                                              }
+
+
+                                                             return true;
                                                          }
                                                      }
 

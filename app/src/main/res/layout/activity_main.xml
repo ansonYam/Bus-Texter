@@ -19,4 +19,13 @@
         android:layout_marginTop="39dp"
         android:text="stop chat head service" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add/Remove Commands"
+        android:id="@+id/modify"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+
 </RelativeLayout>
