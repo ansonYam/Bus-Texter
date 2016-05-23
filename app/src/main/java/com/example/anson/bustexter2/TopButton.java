@@ -26,10 +26,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
+//How the chathead works is explained in the comments of chatheadservice
+// only comments here are about how the file data is read and processed
 
-/**
- * Created by Anson on 2016-03-27.
- */
 public class TopButton extends Service {
     private WindowManager windowManager;
     private ImageView chatHead;
@@ -39,19 +38,11 @@ public class TopButton extends Service {
     private ArrayList<JSONObject> filedata;
     String FILENAME = "DATA_STORE";
 
-    String textTransLink = "33333";
-
-    String UBC49 = "59275";
-    String oak49 = "52037";
-    String oak41 = "50805";
-    String hospital = "51479";
-
-
     @Override
     public void onCreate() {
         super.onCreate();
 
-
+// When the chathead service is started, retrieve the data in the file, you can read about this function in listofCommands
         try {
             filedata = listofCommands.getJSONarray(FILENAME, getApplicationContext());
         } catch (IOException|JSONException e) {
@@ -90,6 +81,7 @@ public class TopButton extends Service {
 
                     Menu menu = popup.getMenu();
 
+                    // for every element in the list, find the label and add them to the menu
                     for(int i = 0; i < filedata.size(); i++){
                         try {
                             menu.add(1, i, i, filedata.get(i).get("label").toString());
@@ -99,6 +91,8 @@ public class TopButton extends Service {
                     }
 
                     popup.getMenuInflater().inflate(R.menu.menu_main, menu);
+
+                    // When an element of the table is tapped, get the number and message from filedata and send it using smsManager
 
                     popup.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
